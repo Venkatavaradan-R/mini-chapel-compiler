@@ -1,5 +1,6 @@
-writeln("hello world");
-var c:bool = true;
-var x:int = 45;
-writeln("c = ",c);
-writeln("x-10*2 = ",x-10*2);
+require "test3.chpl";
+
+{
+var a:int;
+a=10;
+}
