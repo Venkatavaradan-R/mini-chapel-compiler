@@ -48,258 +48,347 @@ vector <string> rhs;
 %type <nt> TypeName
 
 
+
+//
+// identifiers and literals
+//
+%token <pch> TIDENT
+%token <pch> TQUERIEDIDENT
+%token <pch> INTLITERAL
+%token <pch> REALLITERAL
+%token <pch> IMAGLITERAL
+%token <pch> STRINGLITERAL
+%token <pch> BYTESLITERAL
+%token <pch> CSTRINGLITERAL
+%token <pch> EXTERNCODE
+
+
+//
+// keywords (alphabetical)
+//
+%token TALIGN TAS TATOMIC
+%token TBEGIN TBREAK TBOOL TBORROWED TBY TBYTES
+%token TCATCH TCLASS TCOBEGIN TCOFORALL TCOMPLEX TCONFIG TCONST TCONTINUE
+%token TDEFER TDELETE TDMAPPED TDO TDOMAIN
+%token TELSE TENUM TEXCEPT TEXPORT TEXTERN
+%token TFALSE TFOR TFORALL TFOREACH TFORWARDING
+%token TIF TIMAG TIMPORT TIN TINCLUDE
+%token TINDEX TINLINE TINOUT TINT TITER TINITEQUALS
+%token TIMPLEMENTS TINTERFACE
+%token TLABEL TLAMBDA TLET TLIFETIME TLOCAL TLOCALE
+%token TMINUSMINUS TMODULE
+%token TNEW TNIL TNOINIT TNONE TNOTHING
+%token TON TONLY TOPERATOR TOTHERWISE TOUT TOVERRIDE TOWNED
+%token TPARAM TPLUSPLUS TPRAGMA TPRIMITIVE TPRIVATE TPROC TPROTOTYPE TPUBLIC
+%token TREAL TRECORD TREDUCE TREF TREQUIRE TRETURN
+%token TSCAN TSELECT TSERIAL TSHARED TSINGLE TSPARSE TSTRING TSUBDOMAIN TSYNC
+%token TTHEN TTHIS TTHROW TTHROWS TTRUE TTRY TTRYBANG TTYPE
+%token TUINT TUNDERSCORE TUNION TUNMANAGED TUSE
+%token TVAR TVOID
+%token TWHEN TWHERE TWHILE TWITH
+%token TYIELD
+%token TZIP
+
+
+
+//
+// operators and punctuation (alphabetical)
+//
+%token TALIAS TAND TASSIGN TASSIGNBAND TASSIGNBOR TASSIGNBXOR TASSIGNDIVIDE
+%token TASSIGNEXP TASSIGNLAND TASSIGNLOR TASSIGNMINUS TASSIGNMOD
+%token TASSIGNMULTIPLY TASSIGNPLUS TASSIGNREDUCE TASSIGNSL TASSIGNSR
+%token TBANG TBAND TBNOT TBOR TBXOR
+%token TCOLON TCOMMA
+%token TDIVIDE TDOT TDOTDOT TDOTDOTDOT
+%token TEQUAL TEXP TGREATER
+%token TGREATEREQUAL
+%token THASH
+%token TIO
+%token TLESS
+%token TLESSEQUAL
+%token TMINUS TMOD
+%token TNOTEQUAL
+%token TOR
+%token TPLUS
+%token TQUESTION
+%token TSEMI TSHIFTLEFT TSHIFTRIGHT TSTAR TSWAP
+
+//
+// braces
+//
+%token TLCBR TRCBR TLP TRP TLSBR TRSBR
+
+//
+// keywords, operators, and punctuation that requires precedence
+//
+%left TNOELSE
+%left TELSE
+%left TCOMMA
+%left TFOR TFORALL TFOREACH TIF TATOMIC TSYNC TSINGLE
+// %left TOWNED TUNMANAGED TSHARED
+%left TIN
+%left TALIGN TBY THASH
+%left TOR
+%left TAND
+%left TEQUAL TNOTEQUAL
+%left TLESSEQUAL TGREATEREQUAL TLESS TGREATER
+%left TDOTDOT TDOTDOTOPENHIGH
+// These are not currently supported, though we've discussed adding them
+//%left TDOTDOTOPENLOW TDOTDOTOPENBOTH
+%left TPLUS TMINUS
+%left TBOR
+%left TBXOR
+%left TBAND
+%left TSHIFTLEFT TSHIFTRIGHT
+%right TUPLUS TUMINUS
+%left TSTAR TDIVIDE TMOD
+%right TBNOT TLNOT
+%left TREDUCE TSCAN TDMAPPED
+%right TEXP
+%left TCOLON
+%right TBORROWED TOWNED TUNMANAGED TSHARED
+%left TQUESTION TBANG
+%right TNEW
+%left TDOT TLP TRSBR TLCBR
+%nonassoc TPRAGMA
+
+%type <b> access_control use_access_control include_access_control
+%type <b> opt_prototype
+%type <b> opt_throws_error
+
+%type <pt> required_intent_tag opt_intent_tag opt_this_intent_tag
+
+%type <retTag>  opt_ret_tag
+%type <aggrTag> class_tag
+
+%type <pch> ident_use ident_def ident_fn_def
+%type <pch> internal_type_ident_def reserved_type_ident_use
+%type <pch> fn_ident assignop_ident opt_label_ident
+%type <pch> implements_type_ident implements_type_error_ident
+//%type <pch> opt_string
+
+%type <pblockstmt> program
+%type <pblockstmt> toplevel_stmt_ls
+%type <pblockstmt> toplevel_stmt
+%type <vpch>       pragma_ls
+
+%type <pmodsymbol> module_decl_start
+%type <pblockstmt> module_decl_stmt
+%type <pblockstmt> include_module_stmt
+
+%type <pblockstmt> block_stmt
+%type <pblockstmt> stmt_ls
+
+%type <pimportstmt> import_expr
+%type <pblockstmt> use_stmt import_stmt import_ls require_stmt
+%type <ponlylist>  renames_ls use_renames_ls opt_only_ls except_ls
+
+%type <pblockstmt> implements_stmt interface_stmt
+%type <pcallexpr>  ifc_formal_ls
+%type <pdefexpr>   ifc_formal
+
+%type <pblockstmt> class_level_stmt_ls
+
+%type <pblockstmt> stmt
+%type <pblockstmt> do_stmt
+%type <pblockstmt> if_stmt loop_stmt
+%type <pblockstmt> select_stmt assignment_stmt class_level_stmt
+%type <pblockstmt> private_decl
+%type <pblockstmt> forwarding_stmt
+%type <pblockstmt> extern_export_decl_stmt
+/*%type <pblockstmt> extern_record_stmt
+%type <pblockstmt> extern_export_proc_stmt
+%type <pfnsymbol> extern_export_linkage_spec*/
+%type <pblockstmt> extern_block_stmt
+%type <pblockstmt> return_stmt
+%type <pblockstmt> defer_stmt
+%type <pblockstmt> try_stmt
+%type <pblockstmt> throw_stmt
+%type <pblockstmt> catch_stmt_ls
+%type <pexpr>      catch_stmt
+%type <pdefexpr>   catch_expr
+
+%type <pflagset> var_decl_type
+
+%type <pblockstmt> type_alias_decl_stmt type_alias_decl_stmt_inner fn_decl_stmt class_decl_stmt
+%type <pblockstmt> enum_decl_stmt
+
+%type <pblockstmt> var_decl_stmt var_decl_stmt_inner_ls
+%type <pblockstmt> var_decl_stmt_inner tuple_var_decl_stmt_inner_ls
+
+
+%type <pblockstmt> function_body_stmt opt_function_body_stmt
+
+%type <pexpr> when_stmt
+%type <pblockstmt> when_stmt_ls
+
+%type <pcallexpr> array_type
+%type <pexpr> opt_type opt_ret_type ret_array_type
+%type <pexpr> opt_formal_type formal_array_type opt_formal_array_elt_type lambda_decl_expr
+%type <penumtype> enum_header
+%type <pvecOfDefs> enum_ls
+
+%type <pcallexpr> zippered_iterator
+%type <pexpr> call_base_expr call_expr dot_expr
+%type <pexpr> lhs_expr
+%type <pexpr> unary_op_expr binary_op_expr
+%type <pexpr> parenthesized_expr expr actual_expr
+%type <pexpr> bool_literal str_bytes_literal literal_expr
+%type <pexpr> stmt_level_expr sub_type_level_expr type_level_expr scalar_type
+%type <pexpr> lifetime_components_expr
+%type <pexpr> lifetime_expr lifetime_ident
+%type <lifetimeAndWhere> opt_lifetime_where
+%type <pexpr> ident_expr for_expr cond_expr nil_expr io_expr new_expr
+%type <pexpr> let_expr ifvar
+%type <pexpr> reduce_expr scan_expr reduce_scan_op_expr opt_init_expr
+%type <pexpr> opt_init_type var_arg_expr
+%type <pexpr> opt_try_expr opt_expr
+%type <pexpr> tuple_component tuple_var_decl_component
+%type <pdefexpr> formal enum_item
+%type <pexpr> query_expr ifc_constraint
+
+%type <pcallexpr> new_maybe_decorated
+%type <pcallexpr> opt_inherit simple_expr_ls expr_ls assoc_expr_ls tuple_expr_ls
+%type <pcallexpr> opt_actual_ls actual_ls
+%type <pcallexpr> opt_task_intent_ls task_intent_ls task_intent_clause
+%type <pcallexpr> forall_intent_clause forall_intent_ls
+
+%type <pfnsymbol> fn_decl_stmt_inner formal_ls opt_formal_ls req_formal_ls
+%type <pfnsymbol> formal_ls_inner
+%type <pexpr> fn_decl_receiver_expr
+%type <procIterOp> proc_iter_or_op
+%type <pfnsymbol> linkage_spec
+%type <pShadowVar> intent_expr
+%type <pShadowVarPref> shadow_var_prefix
+
+
 %% 
 
-StartFile:
-    RequireClause TopLevelDeclList Block{;}
-	| Block{;}
-	| RequireClause Block {;}
-	;
 
-Block:
-	T_LEFTBRACE OPENB StatementList CLOSEB T_RIGHTBRACE{;}
-	/*empty*/{;}
-	; 
+program:
+  toplevel_stmt_ls                     { yyblock = $$; }
+;
 
-OPENB:
-	/*empty*/{;}
-	;
-	
-CLOSEB:
-	/*empty*/{;}
-	;
+// 'toplevel_stmt_ls' is 'stmt_ls' plus resetTempID()
+toplevel_stmt_ls:
+                                       { $$ = new BlockStmt(); resetTempID(); }
+| toplevel_stmt_ls toplevel_stmt       { $1->appendChapelStmt($2); context->generatedStmt = $1; resetTempID(); }
+;
 
-StatementList:
-    StatementList Statement T_SEMICOLON {;}
-    | Statement T_SEMICOLON {;}
-	;
 
-Statement:
-	Declaration {;}
-	| SimpleStmt {;}
-	| Block {;}
-	| IfStmt {;}
-	| ForStmt {;} 
-	;
-
-SimpleStmt:
-	EmptyStmt {;}
-	| IncDecStmt {;}
-	| Assignment {;} 
-	| WriteStmt {;}
-	;
-
-WriteStmt:
-	T_WRITELN{;}
-	;
-
-EmptyStmt:
-	/*empty*/{;}
-	;
-
-IncDecStmt:
-	Expression T_INCREMENT {;}
-	|Expression T_DECREMENT {;}
-	;
-
-Assignment:
-	ExpressionList assign_op ExpressionList {;}
-	;
-
-Declaration:
-	VarDecl {;}
-	| ConstDecl{;}
-	;
-
-VarDecl:
-		T_VAR VarSpec T_COLON BasicLit {;}
-		;
-
-VarSpec:
-		IdentifierList{;}
-		;
-
-ConstDecl:
-		T_CONST VarSpec T_COLON BasicLit {;}
-		;
+// %type <pblockstmt> toplevel_stmt
+toplevel_stmt:
+   stmt
+|  pragma_ls stmt                      { $$ = buildPragmaStmt( $1, $2 ); }
+;
 
 
 
+// Sequence of pragmas
+pragma_ls:
+  TPRAGMA STRINGLITERAL                { $$ = new Vec<const char*>(); $$->add(astr($2)); }
+| pragma_ls TPRAGMA STRINGLITERAL      { $1->add(astr($3)); }
+;
+
+// %type <pblockstmt> stmt
+stmt:
+block_stmt
+| require_stmt
+| assignment_stmt
+;
+
+
+block_stmt:
+  TLCBR         TRCBR                  { $$ = new BlockStmt(); }
+| TLCBR stmt_ls TRCBR                  { $$ = $2;              }
+| TLCBR error   TRCBR                  { $$ = buildErrorStandin(); }
+;
+
+require_stmt:
+  TREQUIRE expr_ls TSEMI               { $$ = buildRequireStmt($2); }
+;
+
+expr_ls:
+  expr                       { $$ = new CallExpr(PRIM_ACTUALS_LIST, $1); }
+| query_expr                 { $$ = new CallExpr(PRIM_ACTUALS_LIST, $1); }
+| expr_ls TCOMMA expr        { $1->insertAtTail($3); }
+| expr_ls TCOMMA query_expr  { $1->insertAtTail($3); }
+;
+
+query_expr:
+  TQUERIEDIDENT       { $$ = buildQueriedExpr($1); }
+;
+
+
+/* exprs represent valid values and types. Any expression with a valid
+   type also has a valid value as types can appear on the rhs during
+   type-aliasing.  Hence, type_level_expr must be a subset of expr. */
+expr:
+  literal_expr
+| expr TCOLON expr
+    { $$ = createCast($1, $3); }
+
+;
+
+literal_expr:
+  bool_literal
+| str_bytes_literal
+| INTLITERAL            { $$ = buildIntLiteral($1, yyfilename, chplLineno);    }
+| REALLITERAL           { $$ = buildRealLiteral($1);   }
+| IMAGLITERAL           { $$ = buildImagLiteral($1);   }
+| TNONE                 { $$ = new SymExpr(gNone); }
+| TLCBR expr_ls TRCBR   { $$ = new CallExpr("chpl__buildDomainExpr", $2,
+                                            new SymExpr(gTrue)); }
+
+
+;
+
+str_bytes_literal:
+  STRINGLITERAL   { $$ = buildStringLiteral($1); }
+| BYTESLITERAL    { $$ = buildBytesLiteral($1); }
+;
+
+bool_literal:
+  TFALSE { $$ = new SymExpr(gFalse); }
+| TTRUE  { $$ = new SymExpr(gTrue); }
+;
+
+
+assignment_stmt:
+  lhs_expr assignop_ident opt_try_expr TSEMI
+    { $$ = buildAssignment($1, $3, $2);   }
+
+| lhs_expr TASSIGN         TNOINIT TSEMI
+    { $$ = buildAssignment($1, new SymExpr(gNoInit), "="); }
+;
+
+assignop_ident:
+  TASSIGN        { $$ = "="; }
+| TASSIGNPLUS    { $$ = "+="; }
+| TASSIGNMINUS   { $$ = "-="; }
+| TASSIGNMULTIPLY { $$ = "*="; }
+| TASSIGNDIVIDE  { $$ = "/="; }
+| TASSIGNMOD     { $$ = "%="; }
+| TASSIGNEXP     { $$ = "**="; }
+| TASSIGNBAND    { $$ = "&="; }
+| TASSIGNBOR     { $$ = "|="; }
+| TASSIGNBXOR    { $$ = "^="; }
+| TASSIGNSR      { $$ = ">>="; }
+| TASSIGNSL      { $$ = "<<="; }
+;
+
+
+opt_try_expr:
+  TTRY expr       { $$ = tryExpr($2); }
+| expr            { $$ = $1; }
+;
 
 
 
 
-IdentifierList:
-		T_IDENTIFIER IdentifierLIST {;}
-		| T_IDENTIFIER {;}
-		;
-	
-IdentifierLIST:	IdentifierLIST T_COMMA T_IDENTIFIER {;}
-		| T_COMMA T_IDENTIFIER {;}
-		;
-
-TopLevelDeclList:
-    TopLevelDeclList T_SEMICOLON /*here colon*/ TopLevelDecl  {;}
-    | TopLevelDecl  {;}
-	;
-
-TopLevelDecl:
-	Declaration {;}	
-	;
-
-Type:
-	TypeName {;}
-	;
-
-TypeName:
-	T_IDENTIFIER {;}
-	| T_VAR_TYPE {;}
-	;
-
-Operand:
-	Literal {;}
-	| OperandName {;}
-	| T_LEFTPARANTHESES Expression T_RIGHTPARANTHESES {;}
-	;
-
-OperandName:
-	T_IDENTIFIER {;}
-	;
 
 
 
-IfStmt:
-	T_IF Expression Block {;}//{printf("T_IF case 1");}
-	|T_IF Expression Block T_ELSE IfStmt {;}//{printf("T_IF case 5");}
-	|T_IF Expression Block T_ELSE  Block {;}//{printf("T_IF case 6");}
-	|T_IF SimpleStmt T_SEMICOLON Expression Block {;}//{printf("T_IF case 2");}
-	|T_IF SimpleStmt T_SEMICOLON Expression Block T_ELSE IfStmt  {;}//{printf("T_IF case 3");}
-	|T_IF SimpleStmt T_SEMICOLON Expression Block T_ELSE  Block {;}//{printf("T_IF case 4");}
-	;
-
-ForStmt:
-	T_FOR Condition Block {;}
-	|T_FOR ForClause Block {;}
-	;
-Condition:
-	Expression {;}
-	;
-ForClause:
-	SimpleStmt T_SEMICOLON Condition T_SEMICOLON SimpleStmt {;}
-	;
-
-
-ExpressionList:
-		ExpressionList T_COMMA Expression {;}
-		| Expression {;}
-		| T_INTEGER {;}
-		| T_REAL {;}
-		| T_IMAG {;}
-		;
-Literal:
-	BasicLit {;}
-	;
-
-BasicLit:
-	T_VAR_TYPE {;}
-	;
-
-
-PrimaryExpr:
-	Operand {;}
-	|PrimaryExpr Selector {;}
-	|PrimaryExpr Index {;}
-	|PrimaryExpr TypeAssertion {;}
-	;
-
-Selector:
-	T_PERIOD T_IDENTIFIER {;}
-	;
-Index:	
-	T_LEFTBRACKET Expression T_RIGHTBRACKET {;}
-	;
-TypeAssertion:
-	T_PERIOD T_LEFTPARANTHESES Type T_RIGHTPARANTHESES {;}
-	;
-Expression:
-    Expression1 {;}
-	;
-Expression1:
-    Expression1 T_LOR Expression2 {;}
-    | Expression2 {;}
-	;
-Expression2:
-    Expression2 T_LAND Expression3 {;}
-    | Expression3 {;}
-	;
-Expression3:
-    Expression3 rel_op Expression4 {;}
-    | Expression4 {;}
-	;
-Expression4:
-    Expression4 add_op Expression5 {;}
-    | Expression5 {;}
-	;
-Expression5:
-    Expression5 mul_op PrimaryExpr {;}
-    | UnaryExpr {}
-	;
-UnaryExpr:
-	PrimaryExpr {;}
-	| unary_op PrimaryExpr {;}
-	//UnaryExpr {;}
-	;
-
-//ops using tokens
-/*
-binary_op:
-	T_LOR {;}
-	| T_LAND {;}
-	| rel_op {;}
-	| add_op {;}
-	| mul_op {;}
-	;*/
-rel_op:
-	T_EQL {;}
-	| T_NEQ {;}
-	| T_LSR {;}
-	| T_LEQ {;}
-	| T_GTR {;}
-	| T_GEQ {;}
-	;
-
-add_op:
-	T_ADD {;}
-	| T_MINUS {;}
-	;
-
-mul_op:
-	T_MULTIPLY {;}
-	| T_DIVIDE {;}
-	| T_MOD {;}
-	| T_AND {;}
-	;
-
-unary_op:
-	T_ADD {;}
-	| T_MINUS {;}
-	| T_NOT {;}
-	| T_MULTIPLY {;}
-	| T_AND {;}
-	;
-
-assign_op:
-	  T_ASSIGN {;}
-	  ;
-
-RequireClause:
-	/*PACKAGE*/T_REQUIRE PackageName {;}
-	;
-
-PackageName:
-	T_STRING T_SEMICOLON {;}
-	;
-	
 
 	
 %%
