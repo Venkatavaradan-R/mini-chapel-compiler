@@ -1,4 +1,3 @@
-
 %{
 	#include <stdio.h>
     #include<string.h>
@@ -6,21 +5,6 @@
     #include "y.tab.h"    /* token codes from the parser */  
     int yylex();
     void yyerror (char *s);
-
-
-    	#include <stdio.h>
-    #include<string.h>
-    #include "src/SymbolTable.h"
-    #include "y.tab.h"    /* token codes from the parser */  
-    int yylex();
-    void yyerror (char *s);
-
-
-    static int  processIdentifier(yyscan_t scanner, bool queried);
-    static int  processToken(yyscan_t scanner, int t);
-    static void processWhitespace(yyscan_t scanner);
-    static void processInvalidToken(yyscan_t scanner);
-    static int  processSingleLineComment(yyscan_t scanner);
 
 %}
 %option nounput yylineno
@@ -62,120 +46,136 @@ floatLiteral     {decFloatLiteral}|{hexFloatLiteral}
 
 
 %%
-align            return processToken(yyscanner, TALIGN);
-align            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"T_ASSIGN"); return T_ASSIGN;}
 
-begin            return processToken(yyscanner, TBEGIN);
-bool             return processToken(yyscanner, TBOOL);
-break            return processToken(yyscanner, TBREAK);
-by               return processToken(yyscanner, TBY);
-class            return processToken(yyscanner, TCLASS);
-const            return processToken(yyscanner, TCONST);
-do               return processToken(yyscanner, TDO);
-else             return processToken(yyscanner, TELSE);
-for              return processToken(yyscanner, TFOR);
-forall           return processToken(yyscanner, TFORALL);
-foreach          return processToken(yyscanner, TFOREACH);
-false            return processToken(yyscanner, TFALSE);
-if               return processToken(yyscanner, TIF);
-import           return processToken(yyscanner, TIMPORT);
-in               return processToken(yyscanner, TIN);
-include          return processToken(yyscanner, TINCLUDE);
-int              return processToken(yyscanner, TINT);
-iter             return processToken(yyscanner, TITER);
-local            return processToken(yyscanner, TLOCAL);
-param            return processToken(yyscanner, TPARAM);
-private          return processToken(yyscanner, TPRIVATE);
-public           return processToken(yyscanner, TPUBLIC);
-return           return processToken(yyscanner, TRETURN);
-scan             return processToken(yyscanner, TSCAN);
-select           return processToken(yyscanner, TSELECT);
-string           return processToken(yyscanner, TSTRING);
-then             return processToken(yyscanner, TTHEN);
-this             return processToken(yyscanner, TTHIS);
-void             return processToken(yyscanner, TVOID);
-none             return processToken(yyscanner, TNONE);
-when             return processToken(yyscanner, TWHEN);
-where            return processToken(yyscanner, TWHERE);
-while            return processToken(yyscanner, TWHILE);
 
-try              return processToken(yyscanner, TTRY);
 
-"_"              return processToken(yyscanner, TUNDERSCORE);
 
-"="              return processToken(yyscanner, TASSIGN);
-"+="             return processToken(yyscanner, TASSIGNPLUS);
-"-="             return processToken(yyscanner, TASSIGNMINUS);
-"*="             return processToken(yyscanner, TASSIGNMULTIPLY);
-"/="             return processToken(yyscanner, TASSIGNDIVIDE);
-"**="            return processToken(yyscanner, TASSIGNEXP);
-"%="             return processToken(yyscanner, TASSIGNMOD);
-"&="             return processToken(yyscanner, TASSIGNBAND);
-"|="             return processToken(yyscanner, TASSIGNBOR);
-"^="             return processToken(yyscanner, TASSIGNBXOR);
-"&&="            return processToken(yyscanner, TASSIGNLAND);
-"||="            return processToken(yyscanner, TASSIGNLOR);
-"<<="            return processToken(yyscanner, TASSIGNSL);
-">>="            return processToken(yyscanner, TASSIGNSR);
-"=>"             return processToken(yyscanner, TALIAS);
 
-"<=>"            return processToken(yyscanner, TSWAP);
 
-"#"              return processToken(yyscanner, THASH);
-".."             return processToken(yyscanner, TDOTDOT);
-"&&"             return processToken(yyscanner, TAND);
-"||"             return processToken(yyscanner, TOR);
-"!"              return processToken(yyscanner, TBANG);
+align            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TALIGN"); return TALIGN;}
 
-"&"              return processToken(yyscanner, TBAND);
-"|"              return processToken(yyscanner, TBOR);
-"^"              return processToken(yyscanner, TBXOR);
-"~"              return processToken(yyscanner, TBNOT);
+begin            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBEGIN"); return TBEGIN;}
+bool             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBOOL"); return TBOOL;}
+break            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBREAK"); return TBREAK;}
+by               {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBY"); return TBY;}
+class            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TCLASS"); return TCLASS;}
+const            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TCONST"); return TCONST;}
+do               {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TDO"); return TDO;}
+else             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TELSE"); return TELSE;}
+for              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TFOR"); return TFOR;}
+forall           {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TFORALL"); return TFORALL;}
+foreach          {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TFOREACH"); return TFOREACH;}
+true             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TTRUE"); return TTRUE;}
+false            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TFALSE"); return TFALSE;}
+if               {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TIF"); return TIF;}
+import           {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TIMPORT"); return TIMPORT;}
+in               {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TIN"); return TIN;}
+include          {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TINCLUDE"); return TINCLUDE;}
+int              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TINT"); return TINT;}
+iter             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TITER"); return TITER;}
+local            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TLOCAL"); return TLOCAL;}
+param            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TPARAM"); return TPARAM;}
+private          {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TPRIVATE"); return TPRIVATE;}
+public           {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TPUBLIC"); return TPUBLIC;}
+return           {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TRETURN"); return TRETURN;}
+scan             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSCAN"); return TSCAN;}
+select           {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSELECT"); return TSELECT;}
+string           {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSTRING"); return TSTRING;}
+then             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TTHEN"); return TTHEN;}
+this             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TTHIS"); return TTHIS;}
+void             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TVOID"); return TVOID;}
+var              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TVAR"); return TVAR;}
+none             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TNONE"); return TNONE;}
+when             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TWHEN"); return TWHEN;}
+where            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TWHERE"); return TWHERE;}
+while            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TWHILE"); return TWHILE;}
 
-"<<"             return processToken(yyscanner, TSHIFTLEFT);
-">>"             return processToken(yyscanner, TSHIFTRIGHT);
+try              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TTRY"); return TTRY;}
 
-"=="             return processToken(yyscanner, TEQUAL);
-"!="             return processToken(yyscanner, TNOTEQUAL);
-"<="             return processToken(yyscanner, TLESSEQUAL);
-">="             return processToken(yyscanner, TGREATEREQUAL);
-"<"              return processToken(yyscanner, TLESS);
-">"              return processToken(yyscanner, TGREATER);
+"_"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TUNDERSCORE"); return TUNDERSCORE;}
 
-"+"              return processToken(yyscanner, TPLUS);
-"-"              return processToken(yyscanner, TMINUS);
-"*"              return processToken(yyscanner, TSTAR);
-"/"              return processToken(yyscanner, TDIVIDE);
-"%"              return processToken(yyscanner, TMOD);
-"--"             return processToken(yyscanner, TMINUSMINUS);
-"++"             return processToken(yyscanner, TPLUSPLUS);
-"**"             return processToken(yyscanner, TEXP);
-":"              return processToken(yyscanner, TCOLON);
-";"              return processToken(yyscanner, TSEMI);
-","              return processToken(yyscanner, TCOMMA);
-"."              return processToken(yyscanner, TDOT);
-"("              return processToken(yyscanner, TLP);
-")"              return processToken(yyscanner, TRP);
-"["              return processToken(yyscanner, TLSBR);
-"]"              return processToken(yyscanner, TRSBR);
-<INITIAL>"{"     return processToken(yyscanner, TLCBR);
-"}"              return processToken(yyscanner, TRCBR);
+"="              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGN"); return TASSIGN;}
+"+="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNPLUS"); return TASSIGNPLUS;}
+"-="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNMINUS"); return TASSIGNMINUS;}
+"*="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNMULTIPLY"); return TASSIGNMULTIPLY;}
+"/="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNDIVIDE"); return TASSIGNDIVIDE;}
+"**="            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNEXP"); return TASSIGNEXP;}
+"%="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNMOD"); return TASSIGNMOD;}
+"&="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNBAND"); return TASSIGNBAND;}
+"|="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNBOR"); return TASSIGNBOR;}
+"^="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNBXOR"); return TASSIGNBXOR;}
+"&&="            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNLAND"); return TASSIGNLAND;}
+"||="            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNLOR"); return TASSIGNLOR;}
+"<<="            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNSL"); return TASSIGNSL;}
+">>="            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TASSIGNSR"); return TASSIGNSR;}
+"=>"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TALIAS"); return TALIAS;}
 
-"//"             return processSingleLineComment(yyscanner);
+"<=>"            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSWAP"); return TSWAP;}
 
-{intLiteral}     return processToken(yyscanner, INTLITERAL);
-{floatLiteral}   return processToken(yyscanner, REALLITERAL);
+"#"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"THASH"); return THASH;}
+".."             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TDOTDOT"); return TDOTDOT;}
+"&&"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TAND"); return TAND;}
+"||"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TOR"); return TOR;}
+"!"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBANG"); return TBANG;}
 
-{intLiteral}i    return processToken(yyscanner, IMAGLITERAL);
-{floatLiteral}i  return processToken(yyscanner, IMAGLITERAL);
+"&"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBAND"); return TBAND;}
+"|"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBOR"); return TBOR;}
+"^"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBXOR"); return TBXOR;}
+"~"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TBNOT"); return TBNOT;}
 
-{ident}          return processIdentifier(yyscanner, false);
-{queriedIdent}   return processIdentifier(yyscanner, true);
+"<<"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSHIFTLEFT"); return TSHIFTLEFT;}
+">>"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSHIFTRIGHT"); return TSHIFTRIGHT;}
 
-\n               return processNewline(yyscanner);
+"=="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TEQUAL"); return TEQUAL;}
+"!="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TNOTEQUAL"); return TNOTEQUAL;}
+"<="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TLESSEQUAL"); return TLESSEQUAL;}
+">="             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TGREATEREQUAL"); return TGREATEREQUAL;}
+"<"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TLESS"); return TLESS;}
+">"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TGREATER"); return TGREATER;}
 
-[ \t\r\f]        processWhitespace(yyscanner);
-.                processInvalidToken(yyscanner);
+"+"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TPLUS"); return TPLUS;}
+"-"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TMINUS"); return TMINUS;}
+"*"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSTAR"); return TSTAR;}
+"/"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TDIVIDE"); return TDIVIDE;}
+"%"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TMOD"); return TMOD;}
+"--"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TMINUSMINUS"); return TMINUSMINUS;}
+"++"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TPLUSPLUS"); return TPLUSPLUS;}
+"**"             {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TEXP"); return TEXP;}
+":"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TCOLON"); return TCOLON;}
+";"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TSEMI"); return TSEMI;}
+","              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TCOMMA"); return TCOMMA;}
+"."              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TDOT"); return TDOT;}
+"("              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TLP"); return TLP;}
+")"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TRP"); return TRP;}
+"["              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TLSBR"); return TLSBR;}
+"]"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TRSBR"); return TRSBR;}
+<INITIAL>"{"     {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TLCBR"); return TLCBR;}
+"}"              {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TRCBR"); return TRCBR;}
+
+"//".*\n         {yylval.sval = strdup(yytext); }  
+
+
+{intLiteral}     {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"INTLITERAL"); return INTLITERAL;}
+{floatLiteral}   {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"REALLITERAL"); return REALLITERAL;}
+
+{intLiteral}i    {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"IMAGLITERAL"); return IMAGLITERAL;}
+{floatLiteral}i  {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"IMAGLITERAL"); return IMAGLITERAL;}
+
+
+
+
+
+
+
+
+
+{ident}          {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TIDENT"); return TIDENT;}  
+{queriedIdent}   {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"TQUERIEDIDENT"); return TQUERIEDIDENT;}
+
+\n               {yylval.sval = strdup(yytext);  } 
+
+[ \t\r\f]        ;
+.                ;
 
 %%
 
@@ -191,96 +191,9 @@ int yywrap()
     return 1;
 }
 
-static int processToken(yyscan_t scanner, int t) {
-  YYSTYPE* yyLval = yyget_lval(scanner);
-
-  countToken(yyget_text(scanner));
-
-  yyLval->pch = yyget_text(scanner);
-
-  if (captureTokens) {
-    if (t == TASSIGN ||
-        t == TDOTDOTDOT) {
-      captureString.push_back(' ');
-    }
-
-    if (t != TLCBR) {
-      captureString.append(yyget_text(scanner));
-    }
-
-    if (t == TCOMMA  ||
-        t == TPARAM  ||
-        t == TZIP    ||
-        t == TTYPE   ||
-        t == TCONST  ||
-        t == TIN     ||
-        t == TINOUT  ||
-        t == TOUT    ||
-        t == TREF    ||
-        t == TCOLON  ||
-        t == TASSIGN ||
-        t == TRSBR ||
-        t == TBORROWED ||
-        t == TUNMANAGED ||
-        t == TOWNED ||
-        t == TSHARED) {
-      captureString.push_back(' ');
-    }
-  }
-
-  // If the stack has a value then we must be in externmode.
-  // Return to INITIAL
-  if (yy_has_state(scanner) == true) {
-    yy_pop_state(scanner);
-  }
-
-  return t;
-}
-
-static void processInvalidToken(yyscan_t scanner) {
-  ParserContext context(scanner);
-  YYLTYPE*      yyLloc = yyget_lloc(scanner);
-
-  yyerror(yyLloc, &context, "Invalid token");
-}
 
 
-int processNewline(yyscan_t scanner) {
-  YYLTYPE* yyLloc = yyget_lloc(scanner);
-
-  chplLineno++;
-
-  yyLloc->first_column = 0;
-  yyLloc->last_column  = 0;
-
-  yyLloc->first_line   = chplLineno;
-  yyLloc->last_line    = chplLineno;
-
-  countNewline();
-
-  return YYLEX_NEWLINE;
-}
 
 
-static int processSingleLineComment(yyscan_t scanner) {
-  YYSTYPE* yyLval = yyget_lval(scanner);
-  int      c      = 0;
 
-  newString();
-  countCommentLine();
 
-  // Read until the end of the line
-  while ((c = getNextYYChar(scanner)) != '\n' && c != 0) {
-    addChar(c);
-  }
-
-  countSingleLineComment(stringBuffer.c_str());
-
-  if (c != 0) {
-    processNewline(scanner);
-  }
-
-  yyLval->pch = astr(stringBuffer);
-
-  return YYLEX_SINGLE_LINE_COMMENT;
-}

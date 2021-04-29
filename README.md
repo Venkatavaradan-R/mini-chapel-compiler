@@ -8,19 +8,13 @@ To compile the raw lexer, Create the lex (.l) file then:
 - cc lex.yy.c -ll (generates an executable for the lexer)
 - ./a.out
 
-Missing from this version:
-"&&" {printf("(%s, AND)\n", yytext);Insert(yytext,yylineno,"AND");}
-"||" {printf("(%s, OR)\n", yytext);Insert(yytext,yylineno,"OR");}
+~ decide how I wanna do symbol table
 
-{DIGIT}+"."{DIGIT}{+|-}{DIGIT}+"."{DIGIT}+i {yylval.sval = strdup(yytext);printf("(%s, T_COMPLEX)\n", yytext);Insert(yytext,yylineno,"COMPLEX");return T_COMPLEX;}
+~ change lexer from process token accordingly - set yyval.sval (https://github.com/Venkatavaradan-R/mini-chapel-compiler/blob/parse/src/lex.l#L23), insert into table if needed
 
-decide how I wanna do symbol table
+~ remove the trash functions from the bottom of the lexer
 
-change lexer from process token accordingly - set yyval.sval (https://github.com/Venkatavaradan-R/mini-chapel-compiler/blob/parse/src/lex.l#L23), insert into table if needed
-
-remove the trash functions from the bottom of the lexer
-
-check if productions work fully (modify for declarations if necessary)
+~ check if productions work fully (modify for declarations if necessary)
 
 ICG - parser modifications, function definitions
 

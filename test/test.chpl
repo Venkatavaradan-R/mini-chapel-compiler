@@ -1,6 +1,8 @@
-require "test3.chpl";
+var abc:int = true;
 
-{
-var a:int;
-a=10;
-}
+var abc = false;
+
+var abc = 
+12;
+
+x = 10+21/23^23;
