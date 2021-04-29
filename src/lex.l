@@ -8,6 +8,14 @@
     void yyerror (char *s);
 
 
+    	#include <stdio.h>
+    #include<string.h>
+    #include "src/SymbolTable.h"
+    #include "y.tab.h"    /* token codes from the parser */  
+    int yylex();
+    void yyerror (char *s);
+
+
     static int  processIdentifier(yyscan_t scanner, bool queried);
     static int  processToken(yyscan_t scanner, int t);
     static void processWhitespace(yyscan_t scanner);
@@ -55,6 +63,8 @@ floatLiteral     {decFloatLiteral}|{hexFloatLiteral}
 
 %%
 align            return processToken(yyscanner, TALIGN);
+align            {yylval.sval = strdup(yytext); Insert(yytext,yylineno,"T_ASSIGN"); return T_ASSIGN;}
+
 begin            return processToken(yyscanner, TBEGIN);
 bool             return processToken(yyscanner, TBOOL);
 break            return processToken(yyscanner, TBREAK);
