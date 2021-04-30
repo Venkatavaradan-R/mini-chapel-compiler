@@ -1,15 +1,55 @@
 %{
+
 #include <bits/stdc++.h>
-#include "y.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
 using namespace std;
-#include "src/SymbolTable.h"
+
 int yylex();
+
 extern FILE *yyin;
 extern int yylineno;
-//Error Handling
+
 void yyerror (const char *s) {fprintf (stderr, "\033[0;31mLine:%d | %s\n\033[0m\n",yylineno, s);} 
-vector <string> lhs;
-vector <string> rhs;
+
+//Quadraple Structure
+  typedef struct quadruples
+  {
+    char *op;
+    char *arg1;
+    char *arg2;
+    char *res;
+  }quad;
+  int quadlen = 0;
+  //Quadraples data structure
+  quad q[100];
+  //Top of stack
+  int top=-1;
+
+
+//quadraple functions
+void push();
+void pushi(char * i);
+void codegen();
+void codegen_assign();
+void codegen_incdec(int o);
+void printStack();
+void printQuadraples();
+
+
+//Optimization functions
+// void constantPropagation(int index, quad arr[100]);
+// int checkForDigits(char *ch);
+// char* compute(char *x, char *y, char *op);
+// void constantFolding(quad arr[100]);
+// void copyPropagation(quad arr[100]);
+// void DCE(quad arr[100]);
+
+
+
 %}
 
 %start program
@@ -187,7 +227,7 @@ var_decl_stmt:
 
 var_decl_type:
   TPARAM      { ; }
-| TCONST      {; }
+| TCONST      { ; }
 | TVAR        { ; }
 ;
 
@@ -203,20 +243,20 @@ var_decl_stmt_inner:
 ;
 
 ident_def:
-  TIDENT                   { ; }
+  TIDENT                   { push(); }
 | internal_type_ident_def  { ; }
 ;
 
 internal_type_ident_def:
 
-  TBOOL      {; }
-| TINT       { ; }
-| TUINT      { ; }
-| TREAL      { ; }
-| TIMAG      { ; }
-| TCOMPLEX   { ; }
-| TBYTES     {; }
-| TSTRING    { ; }
+  TBOOL      { push(); }
+| TINT       { push(); }
+| TUINT      { push(); }
+| TREAL      { push(); }
+| TIMAG      { push(); }
+| TCOMPLEX   { push(); }
+| TBYTES     { push(); }
+| TSTRING    { push(); }
 ;
 
 
@@ -251,33 +291,39 @@ TMINUSMINUS expr %prec TUMINUS  { ; }
 ;
 
 binary_op_expr:
-  expr TPLUS expr          { ; }
-| expr TMINUS expr         { ; }
-| expr TSTAR expr          { ; }
-| expr TDIVIDE expr        { ; }
-| expr TSHIFTLEFT expr     { ; }
-| expr TSHIFTRIGHT expr    { ; }
-| expr TMOD expr           { ; }
-| expr TEQUAL expr         { ; }
-| expr TNOTEQUAL expr      { ; }
-| expr TLESSEQUAL expr     { ; }
-| expr TGREATEREQUAL expr  { ; }
-| expr TLESS expr          { ; }
-| expr TGREATER expr       { ; }
-| expr TBAND expr          { ; }
-| expr TBOR expr           { ; }
-| expr TBXOR expr          { ; }
-| expr TAND expr           { ; }
-| expr TOR  expr           {; }
-| expr TEXP expr           {; }
+  expr binary_op expr          { codegen(); }
 ;
-     
+
+binary_op:
+
+TPLUS              { push(); }
+|  TMINUS          { push(); }
+|  TSTAR           { push(); }
+|  TDIVIDE         { push(); }
+|  TSHIFTLEFT      { push(); }
+|  TSHIFTRIGHT     { push(); }
+|  TMOD            { push(); }
+|  TEQUAL          { push(); }
+|  TNOTEQUAL       { push(); }
+|  TLESSEQUAL      { push(); }
+|  TGREATEREQUAL   { push(); }
+|  TLESS           { push(); }
+|  TGREATER        { push(); }
+|  TBAND           { push(); }
+|  TBOR            { push(); }
+|  TBXOR           { push(); }
+|  TAND            { push(); }
+|  TOR             { push(); }
+|  TEXP            { push(); }
+;
+
+
 
 
 opt_init_expr:
-                        { ;}
+                        { ; }
 | TASSIGN TNOINIT       { ; }
-| TASSIGN expr  {;}
+| TASSIGN expr  { codegen_assign(); }
 ;
 
 
@@ -319,7 +365,7 @@ expr_ls:
 ;
 
 query_expr:
-  TQUERIEDIDENT       { ;}
+  TQUERIEDIDENT       {push();}
 ;
 
 
@@ -335,9 +381,9 @@ expr:
 literal_expr:
   bool_literal
 | str_bytes_literal
-| INTLITERAL            {;}
-| REALLITERAL           {;}
-| IMAGLITERAL           {;}
+| INTLITERAL            {push();}
+| REALLITERAL           {push();}
+| IMAGLITERAL           {push();}
 | TNONE                 {;}
 | TLCBR expr_ls TRCBR   {;}
 
@@ -345,22 +391,20 @@ literal_expr:
 ;
 
 str_bytes_literal:
-  STRINGLITERAL   {;}
-| BYTESLITERAL    {;}
+  STRINGLITERAL   {push();}
+| BYTESLITERAL    {push();}
 ;
 
 bool_literal:
-  TFALSE {;}
-| TTRUE  {;}
+  TFALSE {push();}
+| TTRUE  {push();}
 ;
 
 
 assignment_stmt:
   lhs_expr assignop_ident opt_try_expr TSEMI
-    {;}
+    {codegen_assign();}
 
-| lhs_expr TASSIGN         TNOINIT TSEMI
-    { ; }
 ;
 
 
@@ -374,36 +418,36 @@ ident_expr:
 ;
 
 ident_use:
-  TIDENT                   { ;}
+  TIDENT                   { push();}
 ;
 
 scalar_type:
-  TBOOL    { ;}
-| TENUM    { ; }
-| TINT     { ; }
-| TUINT    { ;}
-| TREAL    { ; }
-| TIMAG    { ; }
-| TCOMPLEX { ; }
-| TBYTES   { ; }
-| TSTRING  { ; }
-| TNOTHING { ; }
-| TVOID    { ; }
+  TBOOL    { push();}
+| TENUM    { push();}
+| TINT     { push();}
+| TUINT    { push();}
+| TREAL    { push();}
+| TIMAG    { push();}
+| TCOMPLEX { push();}
+| TBYTES   { push();}
+| TSTRING  { push();}
+| TNOTHING { push();}
+| TVOID    { push();}
 ;
 
 assignop_ident:
-  TASSIGN        {;}
-| TASSIGNPLUS    {;}
-| TASSIGNMINUS   {;}
-| TASSIGNMULTIPLY {;}
-| TASSIGNDIVIDE  {;}
-| TASSIGNMOD     {;}
-| TASSIGNEXP     {;}
-| TASSIGNBAND    {;}
-| TASSIGNBOR     {;}
-| TASSIGNBXOR    {;}
-| TASSIGNSR      {;}
-| TASSIGNSL      {;}
+  TASSIGN        {push();}
+| TASSIGNPLUS    {push();}
+| TASSIGNMINUS   {push();}
+| TASSIGNMULTIPLY {push();}
+| TASSIGNDIVIDE  {push();}
+| TASSIGNMOD     {push();}
+| TASSIGNEXP     {push();}
+| TASSIGNBAND    {push();}
+| TASSIGNBOR     {push();}
+| TASSIGNBXOR    {push();}
+| TASSIGNSR      {push();}
+| TASSIGNSL      {push();}
 ;
 
 
@@ -422,6 +466,30 @@ opt_try_expr:
 	
 %%
 
+#include "lex.yy.c"
+#include<ctype.h>
+#include<fstream>
+//Stack
+char st[100][100];
+char i_[2]="0";
+//Temporary variable counter
+int temp_i=0;
+//Char string to store temporary varoable number
+char tmp_i[3];
+char temp[2]="t";
+//Array for labels
+int label[20];
+//Label number counter
+int lnum=0;
+//Top of label stack
+int ltop=0;
+//Label counter for loop
+int l_for=0;
+//Output tac file
+ofstream fo;
+
+
+
 int main (int argc, char** argv) {	
 	printf("Inside main\n");
 
@@ -433,10 +501,124 @@ int main (int argc, char** argv) {
 
 	yyparse ( );
 
+	printf("\n\033[0;32mLexing completed.\033[0m\n\n");
 	printf("\n\033[0;32mParsing completed.\033[0m\n\n");
-	printf("Symbol Table after Lexical Analysis: \n");
-	Display();
+
+  printf("---------------------ICG in the form of Quadruples-------------------------\n\n");
+    printQuadraples();
 
 
 	return 0;
+}
+
+
+//Print top of stack
+void printStack()
+{
+    cout << "Stack Top " << st[top] <<" "<<st[top-1]<<" "<<st[top-2]<<" "<<st[top-3]<<endl;
+}
+//Pushing to stack using yytext
+void push()
+{
+    cout << "Pushed to stack : "<<yytext<<endl;
+    strcpy(st[++top],yytext);
+    printStack();
+}
+
+
+void codegen()
+{   //Intermediate operation assigned to temporary variable
+    strcpy(temp,"T");
+    sprintf(tmp_i, "%d", temp_i);
+    strcat(temp,tmp_i);
+    //Quad creation (eq. T = a + c)
+    printf("%s = %s %s %s\n",temp,st[top-2],st[top-1],st[top]);
+    //Writing into output tac file
+    fo << temp <<" = "<<st[top-2]<<" "<<st[top-1]<<" "<<st[top]<<endl;
+    q[quadlen].op = (char*)malloc(sizeof(char)*strlen(st[top-1]));
+    q[quadlen].arg1 = (char*)malloc(sizeof(char)*strlen(st[top-2]));
+    q[quadlen].arg2 = (char*)malloc(sizeof(char)*strlen(st[top]));
+    q[quadlen].res = (char*)malloc(sizeof(char)*strlen(temp));
+    strcpy(q[quadlen].op,st[top-1]);
+    strcpy(q[quadlen].arg1,st[top-2]);
+    strcpy(q[quadlen].arg2,st[top]);
+    strcpy(q[quadlen].res,temp);
+    quadlen++;
+    //Pop 3 elements from stack (eq. a + c)
+    top-=2;
+    //Pushing temporary variable to stack
+    strcpy(st[top],temp);
+    temp_i++;
+}
+
+void codegen_assign()
+{  
+    //Assignment operation (eg. b = T2 )
+    //T2 < = < b 
+    //Writing into output tac file
+    fo << st[top-2] <<" = "<<st[top]<<endl;
+    printf("%s = %s\n",st[top-2],st[top]);
+    //Quad creation
+    q[quadlen].op = (char*)malloc(sizeof(char));
+    q[quadlen].arg1 = (char*)malloc(sizeof(char)*strlen(st[top]));
+    q[quadlen].arg2 = NULL;
+    q[quadlen].res = (char*)malloc(sizeof(char)*strlen(st[top-2]));
+    strcpy(q[quadlen].op,"=");
+    strcpy(q[quadlen].arg1,st[top]);
+    strcpy(q[quadlen].res,st[top-2]);
+    quadlen++;
+    //Pop elements from stack
+    top-=3;
+}
+
+//Pushing to stack by passing value
+void pushi(char * i)
+{
+    cout << "Pushed to stack : "<<i<<endl;
+    strcpy(st[++top],i);
+}
+
+
+//Only for identifiers
+void codegen_incdec(int o){
+    //Check if increment or decrement
+    if(o)
+        pushi("+");
+    else
+        pushi("-");
+    // Push one to stack
+    pushi("1");
+    // Get identifier at position top-2 which has to be incremented
+    char tempi[31];
+    strcpy(tempi,st[top-2]);
+    //quad generation like Tx = a + 1
+    codegen();
+    pushi("=");
+    cout<<"hello "<<st[top]<<" "<<st[top-1]<<" "<<st[top-2]<<endl;
+    //Pushing temporary variable to top of stack and identifier downwards so Tx=a+1 and a=Tx
+    pushi(st[top-1]);
+    cout<<"hello "<<st[top]<<" "<<st[top-1]<<" "<<st[top-2]<<endl;
+    strcpy(st[top-2],tempi);
+    //Quad genreation for a = Tx
+    codegen_assign();
+}
+
+//Print Quadraples
+void printQuadraples()
+{
+    for(int i=0;i<62;i++)
+        printf("-");
+    cout << endl;
+    printf("Operator \t | Arg1 \t | Arg2 \t | Result \n");
+    for(int i=0;i<62;i++)
+        printf("-");
+    cout << endl;
+    int i;
+    for(i=0;i<quadlen;i++)
+    {
+        printf("%-8s \t | %-8s \t | %-8s \t | %-6s \n",q[i].op,q[i].arg1,q[i].arg2,q[i].res);
+    }
+	for(int i=0;i<62;i++)
+        printf("-");
+    cout << endl;
 }

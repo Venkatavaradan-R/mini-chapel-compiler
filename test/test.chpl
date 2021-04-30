@@ -1,8 +1,19 @@
-var abc:int = true;
+// two ways of declaring variables.
+var abc:bool = true;
+var xyz = false;
 
-var abc = false;
+// static type checking should be implemented
+var abc = 12;
 
-var abc = 
-12;
+// all basic arithmetic
+x=10+5-2*5/6;
+// shifts
+y = 10<<2>>1;
+// relational operators != <= >=
 
-x = 10+21/23^23;
+z = x<=y;
+
+
+
+
+

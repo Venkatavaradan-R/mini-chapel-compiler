@@ -1,10 +1,10 @@
 all:
 	lex src/lex.l
-	yacc -d src/yacc.y -Wno-yacc
-	g++ -w lex.yy.c src/SymbolTable.cpp src/SymbolTable.h y.tab.c -o chplcompiler	
+	yacc -d src/yacc.y --warnings=none
+	g++ y.tab.c -ll -w -o chplcompiler	
 clean:
 	rm lex.yy.c
 	rm y.tab.c
 	rm y.tab.h
-	rm grammar.txt
-	rm chplcompiler
+	rm gocompiler
+

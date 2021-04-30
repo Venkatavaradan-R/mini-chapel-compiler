@@ -1,5 +1,3 @@
-
-var a:int;
-a=10;
-a=a*5;
-a=10*3;
+// example with application of imag numbers
+var rno:imag = 10i;
+x = rno - 5i;
